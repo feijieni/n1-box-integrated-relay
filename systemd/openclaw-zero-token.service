@@ -1,0 +1,25 @@
+[Unit]
+Description=OpenClaw Zero Token Gateway
+After=network-online.target openclaw-chrome-debug.service
+Wants=network-online.target openclaw-chrome-debug.service
+
+[Service]
+Type=forking
+User=root
+WorkingDirectory=/opt/openclaw-zero-token
+Environment=OPENCLAW_CONFIG_PATH=/opt/openclaw-zero-token/.openclaw-upstream-state/openclaw.json
+Environment=OPENCLAW_STATE_DIR=/opt/openclaw-zero-token/.openclaw-upstream-state
+Environment=OPENCLAW_GATEWAY_PORT=3001
+Environment=OPENCLAW_NO_RESPAWN=1
+Environment=NODE_COMPILE_CACHE=/var/tmp/openclaw-compile-cache
+PIDFile=/opt/openclaw-zero-token/.gateway.pid
+ExecStart=/bin/bash -lc 'mkdir -p /var/tmp/openclaw-compile-cache && ./server.sh start'
+ExecStop=/bin/bash -lc './server.sh stop'
+ExecReload=/bin/bash -lc './server.sh restart'
+Restart=on-failure
+RestartSec=5
+TimeoutStartSec=90
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target

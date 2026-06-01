@@ -1,0 +1,73 @@
+{
+  "browser": {
+    "attachOnly": true,
+    "defaultProfile": "openclaw",
+    "profiles": {
+      "openclaw": {
+        "cdpUrl": "http://127.0.0.1:9222",
+        "color": "#4285F4"
+      }
+    }
+  },
+  "models": {
+    "mode": "merge",
+    "providers": {}
+  },
+  "agents": {
+    "defaults": {
+      "maxConcurrent": 1,
+      "subagents": {
+        "maxConcurrent": 1
+      },
+      "models": {},
+      "workspace": "~/.openclaw-zero/workspace"
+    }
+  },
+  "ui": {
+    "assistant": {
+      "name": "OpenClaw",
+      "avatar": "OC"
+    }
+  },
+  "commands": {
+    "native": "auto",
+    "nativeSkills": "auto",
+    "restart": true
+  },
+  "gateway": {
+    "port": 3001,
+    "mode": "local",
+    "bind": "lan",
+    "auth": {
+      "mode": "token",
+      "token": "CHANGE_ME_OPENCLAW_TOKEN"
+    },
+    "tailscale": {
+      "mode": "off",
+      "resetOnExit": false
+    },
+    "http": {
+      "endpoints": {
+        "chatCompletions": {
+          "enabled": true
+        }
+      }
+    },
+    "controlUi": {
+      "enabled": true,
+      "basePath": "/",
+      "allowedOrigins": [
+        "http://N1_LAN_IP:3001",
+        "http://localhost:3001",
+        "http://127.0.0.1:3001"
+      ],
+      "allowInsecureAuth": true
+    }
+  },
+  "tools": {
+    "profile": "full",
+    "sessions": {
+      "visibility": "all"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+[Unit]
+Description=CLIProxyAPI Service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/cli-proxy-api
+ExecStart=/usr/local/bin/cli-proxy-api -config /opt/cli-proxy-api/config.yaml
+Restart=always
+RestartSec=5
+User=root
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,14 @@
+[Unit]
+Description=OpenClaw Serialized API Queue (HAProxy)
+After=network-online.target openclaw-zero-token.service
+Wants=network-online.target
+Requires=openclaw-zero-token.service
+
+[Service]
+Type=simple
+ExecStart=/usr/sbin/haproxy -W -db -f /etc/openclaw-api-queue.cfg
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

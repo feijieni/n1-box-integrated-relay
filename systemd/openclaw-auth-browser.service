@@ -1,0 +1,19 @@
+[Unit]
+Description=OpenClaw Auth Browser (on-demand noVNC + Chromium)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/openclaw-zero-token
+ExecStart=/bin/bash /opt/openclaw-zero-token/auth-browser.sh
+Restart=on-failure
+RestartSec=5
+SuccessExitStatus=143 SIGTERM
+RestartPreventExitStatus=143 SIGTERM
+KillMode=control-group
+TimeoutStopSec=15
+
+[Install]
+WantedBy=multi-user.target

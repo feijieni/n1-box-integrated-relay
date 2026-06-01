@@ -1,0 +1,19 @@
+[Unit]
+Description=OpenClaw Chrome Debug Browser
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/openclaw-zero-token
+ExecStart=/bin/bash /opt/openclaw-zero-token/chrome-debug-daemon.sh
+Restart=always
+RestartSec=5
+SuccessExitStatus=143 SIGTERM
+RestartPreventExitStatus=143 SIGTERM
+KillMode=process
+TimeoutStopSec=15
+
+[Install]
+WantedBy=multi-user.target

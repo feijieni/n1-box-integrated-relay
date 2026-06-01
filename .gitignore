@@ -1,0 +1,61 @@
+﻿# Git metadata
+.git/
+
+# IDE / editor
+.vscode/
+.idea/
+**/.vscode/
+**/.idea/
+**/.DS_Store
+
+# dependencies / package cache
+**/node_modules/
+**/.pnpm-store/
+**/.npm/
+**/.yarn/cache/
+**/.cache/
+**/cache/
+**/tmp/
+**/temp/
+
+# build outputs / generated files
+**/dist/
+**/build/
+**/out/
+**/target/
+**/bin/
+**/.gradle/
+
+# compressed archives
+**/*.zip
+**/*.tar
+**/*.tar.gz
+**/*.tgz
+**/*.7z
+**/*.rar
+
+# logs
+**/logs/
+**/*.log
+
+# runtime state
+**/ACCESS.txt
+**/auth-profiles.json
+**/.openclaw-upstream-state/
+
+# real configs / env files / secrets
+**/config.yaml
+**/.env
+**/.env.*
+**/*.env
+**/openclaw.podman.env
+**/.secrets.baseline
+**/cookies*
+**/*cookie*
+**/*cookies*
+
+# local machine / browser profile state
+**/chrome-profile/
+**/user-data/
+**/User Data/
+**/Default/Cookies
