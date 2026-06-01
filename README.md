@@ -4,6 +4,8 @@ This repository started from a practical problem: I wanted a small Linux box to 
 
 The project brings together two upstream codebases, `CLIProxyAPI` and `openclaw-zero-token`, and adds the deployment layer that is usually missing when people try to run this kind of stack on an N1 box, ARM Linux box, mini PC, or small VPS.
 
+![N1 Box Integrated Relay architecture](./docs/assets/architecture.svg)
+
 The important part of this repository is not just that those upstream trees are present. The important part is the working shape around them:
 
 - service files for long-running operation;
@@ -67,6 +69,8 @@ The intended deployed system looks like this:
 - the box can be reached from LAN devices, and optionally through a public host or reverse proxy;
 - local access information is generated on the target machine;
 - services come back after reboot.
+
+![Request flow through the relay](./docs/assets/request-flow.svg)
 
 The default design favors reliability over maximum throughput. That is intentional. An N1-style box is more useful as a stable relay than as a machine that accepts too much work and then becomes unreliable.
 
@@ -189,6 +193,7 @@ That is the part I want to keep improving.
 - [Public server deployment](./docs/public-server.md)
 - [Publish to GitHub](./docs/publish-github.md)
 - [Security and secrets](./docs/security-and-secrets.md)
+- [Changelog](./CHANGELOG.md)
 
 ## Short description
 
