@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="520" viewBox="0 0 1180 520" role="img" aria-labelledby="title desc">
+  <title id="title">Request flow through N1 Box Integrated Relay</title>
+  <desc id="desc">A request enters through LAN or public access, is routed to API proxy or queued OpenClaw API, uses browser login when needed, and writes only local runtime state on the target machine.</desc>
+  <defs>
+    <style>
+      .bg { fill: #fbfbfc; }
+      .step { fill: #ffffff; stroke: #a8b1c0; stroke-width: 2; rx: 16; }
+      .queue { fill: #eefaf1; stroke: #5fa66f; stroke-width: 2; rx: 16; }
+      .state { fill: #fff6e5; stroke: #d19a2e; stroke-width: 2; rx: 16; }
+      .h { font: 700 18px Arial, sans-serif; fill: #1f2937; }
+      .t { font: 14px Arial, sans-serif; fill: #374151; }
+      .s { font: 12px Arial, sans-serif; fill: #5b6675; }
+      .title { font: 700 27px Arial, sans-serif; fill: #111827; }
+      .line { stroke: #657386; stroke-width: 2.4; fill: none; marker-end: url(#arrow); }
+      .line2 { stroke: #3d7a4b; stroke-width: 2.4; fill: none; marker-end: url(#arrowGreen); }
+    </style>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M2,2 L10,6 L2,10 Z" fill="#657386"/></marker>
+    <marker id="arrowGreen" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M2,2 L10,6 L2,10 Z" fill="#3d7a4b"/></marker>
+  </defs>
+  <rect class="bg" width="1180" height="520"/>
+  <text x="42" y="55" class="title">Request flow</text>
+  <text x="42" y="82" class="t">The default path is conservative: keep the relay reachable, queue heavy work, and keep private state off GitHub.</text>
+
+  <rect x="45" y="145" width="155" height="95" class="step"/>
+  <text x="78" y="179" class="h">Client</text>
+  <text x="73" y="204" class="s">LAN tool, phone,</text>
+  <text x="76" y="222" class="s">browser, agent</text>
+
+  <rect x="250" y="145" width="170" height="95" class="step"/>
+  <text x="287" y="179" class="h">Access layer</text>
+  <text x="278" y="204" class="s">LAN IP, public host,</text>
+  <text x="287" y="222" class="s">or reverse proxy</text>
+
+  <rect x="470" y="90" width="185" height="95" class="step"/>
+  <text x="518" y="124" class="h">CLIProxyAPI</text>
+  <text x="505" y="149" class="s">provider-compatible</text>
+  <text x="525" y="167" class="s">API relay</text>
+
+  <rect x="470" y="245" width="185" height="95" class="queue"/>
+  <text x="511" y="279" class="h">HAProxy queue</text>
+  <text x="506" y="304" class="s">serializes OpenClaw</text>
+  <text x="520" y="322" class="s">API requests</text>
+
+  <rect x="715" y="245" width="185" height="95" class="step"/>
+  <text x="744" y="279" class="h">OpenClaw runtime</text>
+  <text x="752" y="304" class="s">tools, channels,</text>
+  <text x="765" y="322" class="s">control service</text>
+
+  <rect x="715" y="90" width="185" height="95" class="step"/>
+  <text x="760" y="124" class="h">Chrome service</text>
+  <text x="748" y="149" class="s">login and attach-only</text>
+  <text x="781" y="167" class="s">web models</text>
+
+  <rect x="955" y="168" width="180" height="120" class="state"/>
+  <text x="996" y="205" class="h">Target state</text>
+  <text x="987" y="232" class="s">generated access files</text>
+  <text x="1000" y="251" class="s">browser session</text>
+  <text x="1001" y="270" class="s">local config/logs</text>
+
+  <path d="M200 192 L250 192" class="line"/>
+  <path d="M420 170 C445 150 450 137 470 137" class="line"/>
+  <path d="M420 215 C450 235 450 292 470 292" class="line2"/>
+  <path d="M655 292 L715 292" class="line2"/>
+  <path d="M807 245 L807 185" class="line"/>
+  <path d="M900 137 C930 145 940 170 955 200" class="line"/>
+  <path d="M900 292 C930 285 940 265 955 250" class="line"/>
+
+  <rect x="255" y="390" width="670" height="70" class="state"/>
+  <text x="285" y="420" class="h">Publish boundary</text>
+  <text x="285" y="444" class="t">GitHub keeps source, docs, templates, and install logic. Runtime secrets stay on the device that runs the relay.</text>
+</svg>
