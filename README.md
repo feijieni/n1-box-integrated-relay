@@ -1,157 +1,90 @@
 # N1 Box Integrated Relay Package
 
-N1 Box Integrated Relay Package is an open-source deployment integration project for turning low-cost Linux machines, N1-style TV boxes, and small public servers into reproducible AI relay nodes.
+This repository started from a practical problem: I wanted a small Linux box to behave like an always-on AI relay node, not like a fragile folder of scripts that only works on the machine where it was first assembled.
 
-It integrates upstream AI relay/runtime components with a practical deployment layer:
+The project brings together two upstream codebases, `CLIProxyAPI` and `openclaw-zero-token`, and adds the deployment layer that is usually missing when people try to run this kind of stack on an N1 box, ARM Linux box, mini PC, or small VPS.
 
-- `CLIProxyAPI` source tree for API proxying and provider compatibility.
-- `openclaw-zero-token` source tree for OpenClaw runtime, web-model access, browser-assisted authentication, channels, tools, and control services.
-- N1/Linux deployment layout with `config/`, `systemd/`, `haproxy/`, and `install_n1.sh`.
-- Serialized request handling through HAProxy so small devices can act as stable relay nodes instead of being overwhelmed by concurrent requests.
-- Chrome/Chromium service integration for attach-only web models and browser-based login workflows.
-- LAN and public-server deployment examples for self-hosted AI agent infrastructure.
+The important part of this repository is not just that those upstream trees are present. The important part is the working shape around them:
 
-The goal is not to publish another isolated proxy or another isolated runtime tree. The goal is to make a complex AI relay stack reproducible on low-cost hardware.
+- service files for long-running operation;
+- HAProxy queueing for small devices that should not handle unlimited concurrent requests;
+- Chrome/Chromium service management for browser-based model login and attach-only web workflows;
+- install-time configuration for LAN and public access;
+- a safer publish layout that keeps real cookies, access files, browser state, and local runtime data out of Git;
+- notes and scripts that document how this setup is expected to run after reboot.
 
-## Why this project exists
+In short, this is an attempt to turn a one-off N1 setup into something other people can inspect, adapt, and reproduce.
 
-AI agent tooling is becoming more powerful, but many deployment examples assume a desktop workstation, a cloud server, or a manually configured environment. Low-cost always-on machines such as N1 boxes, ARM Linux boxes, and small VPS servers are useful for personal AI relay infrastructure, but setting them up is error-prone:
+## What problem it solves
 
-- multiple upstream projects need to be installed together;
-- services need to start automatically after reboot;
-- browser-based model login needs a persistent Chrome/Chromium environment;
-- API access needs to be reachable from other devices;
-- small devices need queueing instead of uncontrolled concurrency;
-- runtime secrets, cookies, logs, and generated state must not be mixed with publishable source code.
+Running AI relay tooling on a normal desktop is one thing. Running it on a small always-on box is different.
 
-This repository packages those concerns into a public, reproducible integration layer.
+A small device needs boring, conservative engineering:
 
-## What this bundle is for
+- services should restart after boot;
+- request bursts should be serialized or queued;
+- browser login state must be handled carefully;
+- LAN access should work without editing many files by hand;
+- public access should be possible without mixing public examples with private secrets;
+- generated files should stay on the target machine instead of being committed back to the repository.
 
-After someone clones this repository to their own Linux box, the intended deployment flow is:
+Most failures I ran into were not caused by one single upstream project. They came from the gaps between projects: one process not starting after reboot, one port not matching the docs, a browser session not being available, a small box getting overloaded, or a private runtime file accidentally ending up next to publishable source.
 
-```bash
-chmod +x install_n1.sh
-sudo ./install_n1.sh
-```
+This repository is mainly about closing those gaps.
 
-The target behavior is:
-
-- `CLIProxyAPI` runs as a service;
-- a dedicated Chrome debug browser stays up for attach-only web models;
-- `openclaw-zero-token` runs as a service;
-- services are reachable from other devices on LAN or from a configured public host;
-- services start automatically on boot;
-- `openclaw-zero-token` exposes a serialized API port;
-- one main OpenClaw request runs at a time by default on small machines;
-- a noVNC browser service can be started on demand for web login.
-
-## Project value
-
-This project is useful because it turns a fragile manual setup into a repeatable deployment pattern:
-
-1. **Lower-cost AI relay infrastructure**
-
-   Instead of keeping a full desktop or cloud VM running, users can experiment with always-on N1/Linux boxes as local AI relay nodes.
-
-2. **Practical OpenClaw/agent deployment path**
-
-   It provides a concrete deployment layout for OpenClaw-style runtime services, browser login, API relay, service supervision, and serialized request handling.
-
-3. **Safer publishable layout**
-
-   Runtime state, real access files, cookies, bearer tokens, logs, and private machine-specific configuration are intentionally kept out of the public repository.
-
-4. **Reproducible service operation**
-
-   systemd service files and HAProxy queue configuration make the relay easier to restart, observe, and run after boot.
-
-5. **Bridge between upstream tools and real devices**
-
-   The repository connects upstream projects with a hardware-aware deployment layer for small Linux machines.
-
-## Content sources
-
-This bundle has two kinds of content.
-
-### 1. Upstream source trees
-
-- `CLIProxyAPI/`
-- `openclaw-zero-token/`
-
-These folders started from upstream open-source projects and are included here so the integration can be inspected and reproduced as one repository.
-
-### 2. N1/Linux deployment integration layer
-
-- `config/`
-- `systemd/`
-- `haproxy/`
-- `install_n1.sh`
-- `docs/`
-
-These files define the N1/Linux deployment behavior: service installation, generated configuration, serialized queueing, browser service startup, access information, and safety notes.
-
-The most accurate description is:
-
-```text
-upstream source + Linux/N1 deployment integration + one-command installer + serialized AI relay operation
-```
-
-## Source release note
-
-This public GitHub repository is a source-first release. It intentionally does **not** publish live runtime state or private machine state.
-
-Do not expect real local secrets, cookies, generated access files, logs, or private runtime directories to exist in the repository.
-
-For production-ready one-shot offline installation, generated artifacts such as prebuilt binaries or compiled frontend/runtime outputs should be produced by one of these paths:
-
-- build from source during installation;
-- publish release artifacts through GitHub Releases;
-- provide a separate private deployment bundle for a specific machine.
-
-This keeps the public repository safe for review while still preserving the integration logic.
-
-## Directory layout
+## What is inside
 
 ```text
 n1-box/
-├── CLIProxyAPI/
-├── openclaw-zero-token/
-├── config/
-├── haproxy/
-├── systemd/
-├── docs/
-├── install_n1.sh
+├── CLIProxyAPI/              # API proxy/provider compatibility source tree
+├── openclaw-zero-token/      # OpenClaw runtime, tools, channels, and browser-related source tree
+├── config/                   # publishable example configs
+├── haproxy/                  # serialized API queue config
+├── systemd/                  # service definitions
+├── docs/                     # install, security, design, and deployment notes
+├── install_n1.sh             # Linux/N1 install entry point
 ├── .gitignore
 ├── LICENSE
 └── README.md
 ```
 
-## Supported deployment styles
+The repo should be read as:
 
-This bundle can be used in two common ways.
+```text
+upstream source trees + small-device deployment layer + service orchestration + queueing + safety boundary
+```
 
-### 1. N1 or other LAN box
+That last part matters. Without the deployment layer, this would mostly be a source mirror. Without the upstream projects, the deployment layer would not do anything useful. The value is in making the combined system understandable and repeatable.
 
-Example LAN access:
+## Target behavior
+
+The intended deployed system looks like this:
+
+- `CLIProxyAPI` runs as a managed service;
+- `openclaw-zero-token` runs as a managed service;
+- a Chrome/Chromium debug browser can stay available for attach-only web model workflows;
+- HAProxy exposes a serialized OpenClaw API port so small machines are not flooded by parallel requests;
+- the box can be reached from LAN devices, and optionally through a public host or reverse proxy;
+- local access information is generated on the target machine;
+- services come back after reboot.
+
+The default design favors reliability over maximum throughput. That is intentional. An N1-style box is more useful as a stable relay than as a machine that accepts too much work and then becomes unreliable.
+
+## Deployment styles
+
+### LAN box
+
+For a home or lab network, the device can be reached through a LAN address such as:
 
 ```text
 192.168.1.100
 ```
 
-### 2. Public server
+### Public server
 
-The same layout can also be deployed on a public Linux server, optionally with an HTTPS reverse proxy in front of the control UI.
+The same layout can be adapted to a public Linux server. For public access, a reverse proxy and HTTPS should be used for the UI side. The noVNC/browser login service should not be exposed directly to the public internet unless the operator understands the risk.
 
-The installer supports both styles through:
-
-- `N1_LAN_IP`
-- `PUBLIC_ACCESS_HOST`
-- `PRIMARY_ACCESS_HOST`
-- `ACCESS_HOSTS_EXTRA`
-- `CONTROL_UI_EXTRA_ORIGINS`
-
-Example:
+Example install variables:
 
 ```bash
 sudo N1_LAN_IP=192.168.1.100 \
@@ -161,34 +94,37 @@ sudo N1_LAN_IP=192.168.1.100 \
   ./install_n1.sh
 ```
 
-That lets the same backend stay reachable from:
+## Source-first public release
 
-- the LAN IP;
-- the public IP or domain;
-- optional HTTPS reverse proxy origins for the OpenClaw control UI.
+This public repository is kept source-first on purpose.
 
-## What the installer is designed to do
+It should not contain real local runtime state, browser cookies, generated access files, account logs, or private machine configuration. Those files belong on the machine that is actually running the services.
 
-The installer is designed to:
+For a completely offline one-shot install, generated artifacts such as prebuilt binaries or compiled runtime/frontend outputs should be produced through one of these paths:
 
-- verify the bundle layout before touching the target machine;
+- build them from source during install;
+- publish them as GitHub Release artifacts;
+- keep a private machine-specific deployment bundle outside the public source repository.
+
+The current public branch is the integration source and documentation base. The next step is to make the build/release artifact path cleaner so a fresh clone can be turned into a ready-to-run bundle with fewer manual steps.
+
+## What the installer is meant to handle
+
+The installer is designed around the deployment shape, not around a single binary:
+
+- verify the expected layout before changing the target machine;
 - install runtime packages;
-- auto-detect and install a usable Chrome/Chromium package;
+- detect or install a usable Chrome/Chromium package;
 - install Node.js 22 and pnpm when needed;
-- copy both projects into `/opt`;
+- copy project files into `/opt`;
 - install OpenClaw runtime dependencies;
-- install `tsx` so web authentication helpers can run on a fresh machine;
-- install systemd service files;
+- install service files;
 - install HAProxy queue config;
-- generate API keys and tokens if they are not provided;
-- write local access information files on the target machine;
-- enable auto start;
-- start services;
-- health-check services and stop with logs if one does not come up.
+- generate local API keys and access information when not provided;
+- enable services at boot;
+- start services and stop early with logs if a health check fails.
 
-## Important outputs
-
-After installation, access details are written on the target machine to:
+Typical local output files after install:
 
 - `/opt/cli-proxy-api/ACCESS.txt`
 - `/opt/openclaw-zero-token/ACCESS.txt`
@@ -201,9 +137,9 @@ Typical ports:
 - `9222` -> local Chrome CDP for attach-only web models
 - `6080` -> noVNC auth browser
 
-## Security and publish safety
+## Security boundary
 
-Do not commit live runtime state:
+These should not be committed:
 
 - `.openclaw-upstream-state/`
 - `auth-profiles.json`
@@ -211,33 +147,49 @@ Do not commit live runtime state:
 - real `config.yaml`
 - cookies
 - bearer tokens
-- logs with account data
+- account logs
 - local browser profiles
 - machine-specific runtime directories
 
-The public repository is meant to contain source, examples, service templates, and deployment logic, not private account/session state.
+The repository should contain source, examples, templates, and deployment logic. Real secrets and runtime state should be generated or stored on the target machine.
 
-## Current status
+## Project direction
 
-This repository is an early public integration release. The main focus is to make the deployment pattern reviewable and reproducible.
+This is an early public release, but the direction is clear:
 
-Planned improvements:
+- make the install path more reproducible on fresh Linux/N1 machines;
+- separate source, generated artifacts, and private runtime state more cleanly;
+- add a release-bundle path for users who do not want to build everything manually;
+- record tested device/server reports;
+- document failure cases such as browser login problems, queue behavior, proxy access, and service startup failures;
+- keep upstream synchronization understandable instead of hiding changes in a private bundle.
 
-- make build/release artifact handling clearer;
-- improve installer behavior when prebuilt outputs are absent;
-- add release packages for easier one-shot deployment;
-- add tested install reports for common Linux/N1-style environments;
-- add troubleshooting examples for network, browser login, and queue behavior.
+## Why it is not just an integration dump
+
+A simple integration dump would only place two upstream projects in one folder.
+
+This repository tries to define how the combined stack should behave on a real small machine:
+
+- what should be a system service;
+- which port should be exposed directly;
+- which port should be serialized;
+- which files are safe to publish;
+- which files must stay local;
+- how browser login should be separated from the API relay path;
+- how the same setup can be moved from an N1 box to a small public server.
+
+That is the part I want to keep improving.
 
 ## Docs
 
 - [Why this project matters](./docs/why-this-project.md)
+- [Design decisions](./docs/design-decisions.md)
 - [Install on Linux or N1](./docs/install-n1.md)
 - [Quick start](./docs/quick-start.md)
 - [Public server deployment](./docs/public-server.md)
 - [Publish to GitHub](./docs/publish-github.md)
 - [Security and secrets](./docs/security-and-secrets.md)
 
-## Suggested short description
+## Short description
 
-> A reproducible Linux/N1 deployment bundle that turns low-cost boxes into AI relay nodes by integrating CLIProxyAPI, OpenClaw Zero Token, systemd services, HAProxy serialized queues, browser-based model login, and LAN/public access configuration.
+A Linux/N1 deployment project for running self-hosted AI relay nodes on low-cost always-on machines. It combines CLIProxyAPI, OpenClaw Zero Token, systemd services, HAProxy queueing, browser-based model login, and safe publish rules into one reproducible layout.
