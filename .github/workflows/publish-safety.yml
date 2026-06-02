@@ -1,4 +1,4 @@
-name: Publish safety
+name: Repository checks
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  publish-safety:
+  repository-checks:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -16,3 +16,9 @@ jobs:
 
       - name: Run publish safety checks
         run: bash scripts/check-publish-safety.sh
+
+      - name: Run repository health checks
+        run: bash scripts/check-repo-health.sh
+
+      - name: Run non-destructive doctor
+        run: bash scripts/doctor.sh
