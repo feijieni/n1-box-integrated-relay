@@ -1,0 +1,18 @@
+name: Publish safety
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  publish-safety:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run publish safety checks
+        run: bash scripts/check-publish-safety.sh
