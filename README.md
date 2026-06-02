@@ -43,6 +43,7 @@ n1-box/
 ├── config/                   # publishable example configs
 ├── haproxy/                  # serialized API queue config
 ├── systemd/                  # service definitions
+├── scripts/                  # non-destructive checks and maintainer helpers
 ├── docs/                     # install, security, design, and deployment notes
 ├── install_n1.sh             # Linux/N1 install entry point
 ├── .gitignore
@@ -57,6 +58,23 @@ upstream source trees + small-device deployment layer + service orchestration + 
 ```
 
 That last part matters. Without the deployment layer, this would mostly be a source mirror. Without the upstream projects, the deployment layer would not do anything useful. The value is in making the combined system understandable and repeatable.
+
+## Quick checks before installing
+
+The repository includes two non-destructive checks that are safe to run before installing anything.
+
+```bash
+bash scripts/doctor.sh
+```
+
+`doctor.sh` checks the local machine and repository layout. It looks for required project files, optional build artifacts, useful host commands, common relay ports, and existing systemd service names. It does not install packages, start services, or write system files.
+
+```bash
+bash scripts/check-repo-health.sh
+bash scripts/check-publish-safety.sh
+```
+
+These checks are also wired into GitHub Actions. They help keep the public repository useful and safe by checking shell syntax, local docs links, expected files, large tracked files, private machine identifiers, and obvious secret-shaped mistakes.
 
 ## Target behavior
 
@@ -197,4 +215,4 @@ That is the part I want to keep improving.
 
 ## Short description
 
-A Linux/N1 deployment project for running self-hosted AI relay nodes on low-cost always-on machines. It combines CLIProxyAPI, OpenClaw Zero Token, systemd services, HAProxy queueing, browser-based model login, and safe publish rules into one reproducible layout.
+A Linux/N1 deployment project for running self-hosted AI relay nodes on low-cost always-on machines. It combines CLIProxyAPI, OpenClaw Zero Token, systemd services, HAProxy queueing, browser-based model login, safety checks, and safe publish rules into one reproducible layout.
