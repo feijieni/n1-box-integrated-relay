@@ -80,9 +80,22 @@ check_systemd_unit() {
   fi
 }
 
+print_host_hint() {
+  printf 'Target style: Raspberry Pi, Linux TV box, ARM board, mini PC, home server, or VPS\n'
+  if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    printf 'Detected OS: %s\n' "${PRETTY_NAME:-unknown}"
+  fi
+  if command -v uname >/dev/null 2>&1; then
+    printf 'Kernel/arch: %s / %s\n' "$(uname -srm 2>/dev/null || true)" "$(uname -m 2>/dev/null || true)"
+  fi
+}
+
 main() {
-  printf 'N1 Box Integrated Relay doctor\n'
-  printf 'Repository: %s\n\n' "$ROOT_DIR"
+  printf 'Linux Device AI Relay doctor\n'
+  printf 'Repository: %s\n' "$ROOT_DIR"
+  print_host_hint
+  printf '\n'
 
   info "Checking repository layout"
   check_path "CLIProxyAPI/go.mod" "CLIProxyAPI Go module"
@@ -92,7 +105,7 @@ main() {
   check_path "haproxy/openclaw-api-queue.cfg" "HAProxy queue config"
   check_path "systemd/cliproxyapi.service" "CLIProxyAPI service template"
   check_path "systemd/openclaw-zero-token.service" "OpenClaw service template"
-  check_path "install_n1.sh" "installer"
+  check_path "install_n1.sh" "installer compatibility entry point"
 
   printf '\n'
   info "Checking source-first release artifacts"
