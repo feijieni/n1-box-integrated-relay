@@ -84,7 +84,7 @@ That last part matters. Without the deployment layer, this would mostly be a sou
 
 ## Quick checks before installing
 
-The repository includes two non-destructive checks that are safe to run before installing anything.
+The repository includes non-destructive checks that are safe to run before installing anything.
 
 ```bash
 bash scripts/doctor.sh
@@ -99,6 +99,20 @@ bash scripts/check-publish-safety.sh
 
 These checks are also wired into GitHub Actions. They help keep the public repository useful and safe by checking shell syntax, local docs links, expected files, large tracked files, private machine identifiers, and obvious secret-shaped mistakes.
 
+## Deployment requirements
+
+The current installer is meant for a real Linux host with:
+
+- Debian, Ubuntu, Armbian, or a similar `apt-get` based system;
+- systemd available and running;
+- root or sudo access;
+- network access during install;
+- enough disk space to install Node.js, pnpm dependencies, browser packages, HAProxy, and build tools.
+
+The installer is not designed for a minimal container shell because it needs systemd services, service health checks, local ports, and persistent runtime directories.
+
+The public repository is source-first. Some generated outputs or prebuilt artifacts may be absent from a fresh clone. The installer already has source-build behavior for `CLIProxyAPI` when a bundled binary for the host architecture is missing, but release-bundle handling is still one of the next areas to improve.
+
 ## Deploy
 
 The main installer is:
@@ -109,21 +123,26 @@ install_n1.sh
 
 The file name is kept for compatibility with the original deployment, but the script is meant for Debian/Ubuntu/Armbian-style Linux hosts with `apt-get` and systemd.
 
-Before running the installer, clone the repository on the Linux device or server that will run the relay:
+### 1. Clone on the target host
+
+Run this on the Raspberry Pi, TV box, mini PC, home server, VPS, or other Linux host that will become the relay:
 
 ```bash
 git clone https://github.com/feijieni/n1-box-integrated-relay.git
 cd n1-box-integrated-relay
 ```
 
-Run the non-destructive checks first:
+### 2. Run preflight checks
 
 ```bash
 bash scripts/doctor.sh
+bash scripts/check-repo-health.sh
 bash scripts/check-publish-safety.sh
 ```
 
-For a LAN-only host, run:
+If `doctor.sh` warns that optional build artifacts such as `CLIProxyAPI/bin` or `openclaw-zero-token/dist` are missing, that means the checkout is source-first. Review the warning before installing. Required repository files must be present before the installer can run.
+
+### 3. Install for a LAN device or home server
 
 ```bash
 chmod +x install_n1.sh
@@ -132,7 +151,7 @@ sudo N1_LAN_IP=192.168.1.100 ./install_n1.sh
 
 Replace `192.168.1.100` with the LAN IP of your Raspberry Pi, TV box, mini PC, home server, VPS private interface, or other Linux relay host.
 
-For a public server or reverse-proxy deployment, run something like:
+### 4. Install for a public server or reverse-proxy setup
 
 ```bash
 sudo N1_LAN_IP=192.168.1.100 \
@@ -150,6 +169,7 @@ The installer currently expects a real root/systemd host, not a minimal containe
 
 During installation it will:
 
+- verify that required project files, configs, service templates, and queue config are present;
 - install base packages such as `curl`, `jq`, `haproxy`, `xvfb`, `x11vnc`, `websockify`, `novnc`, build tools, Python, and related utilities;
 - detect or install Chrome/Chromium for browser-assisted login and attach-only web model workflows;
 - install Node.js 22 when needed;
