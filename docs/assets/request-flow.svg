@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1180" height="520" viewBox="0 0 1180 520" role="img" aria-labelledby="title desc">
-  <title id="title">Request flow through N1 Box Integrated Relay</title>
-  <desc id="desc">A request enters through LAN or public access, is routed to API proxy or queued OpenClaw API, uses browser login when needed, and writes only local runtime state on the target machine.</desc>
+  <title id="title">Request flow through Linux Device AI Relay</title>
+  <desc id="desc">A request enters through LAN or public access, is routed to API proxy or queued OpenClaw API, uses browser login when needed, and writes only local runtime state on a Linux device or small server.</desc>
   <defs>
     <style>
       .bg { fill: #fbfbfc; }
@@ -18,8 +18,8 @@
     <marker id="arrowGreen" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M2,2 L10,6 L2,10 Z" fill="#3d7a4b"/></marker>
   </defs>
   <rect class="bg" width="1180" height="520"/>
-  <text x="42" y="55" class="title">Request flow</text>
-  <text x="42" y="82" class="t">The default path is conservative: keep the relay reachable, queue heavy work, and keep private state off GitHub.</text>
+  <text x="42" y="55" class="title">Request flow on a Linux relay host</text>
+  <text x="42" y="82" class="t">The default path is conservative: keep Raspberry Pi, TV box, mini PC, home server, or VPS deployments reachable and predictable.</text>
 
   <rect x="45" y="145" width="155" height="95" class="step"/>
   <text x="78" y="179" class="h">Client</text>
@@ -39,7 +39,7 @@
   <rect x="470" y="245" width="185" height="95" class="queue"/>
   <text x="511" y="279" class="h">HAProxy queue</text>
   <text x="506" y="304" class="s">serializes OpenClaw</text>
-  <text x="520" y="322" class="s">API requests</text>
+  <text x="518" y="322" class="s">API requests</text>
 
   <rect x="715" y="245" width="185" height="95" class="step"/>
   <text x="744" y="279" class="h">OpenClaw runtime</text>
@@ -67,5 +67,5 @@
 
   <rect x="255" y="390" width="670" height="70" class="state"/>
   <text x="285" y="420" class="h">Publish boundary</text>
-  <text x="285" y="444" class="t">GitHub keeps source, docs, templates, and install logic. Runtime secrets stay on the device that runs the relay.</text>
+  <text x="285" y="444" class="t">GitHub keeps source, docs, templates, checks, and install logic. Runtime secrets stay on the relay host.</text>
 </svg>
