@@ -99,6 +99,168 @@ bash scripts/check-publish-safety.sh
 
 These checks are also wired into GitHub Actions. They help keep the public repository useful and safe by checking shell syntax, local docs links, expected files, large tracked files, private machine identifiers, and obvious secret-shaped mistakes.
 
+## Deploy
+
+The main installer is:
+
+```bash
+install_n1.sh
+```
+
+The file name is kept for compatibility with the original deployment, but the script is meant for Debian/Ubuntu/Armbian-style Linux hosts with `apt-get` and systemd.
+
+Before running the installer, clone the repository on the Linux device or server that will run the relay:
+
+```bash
+git clone https://github.com/feijieni/n1-box-integrated-relay.git
+cd n1-box-integrated-relay
+```
+
+Run the non-destructive checks first:
+
+```bash
+bash scripts/doctor.sh
+bash scripts/check-publish-safety.sh
+```
+
+For a LAN-only host, run:
+
+```bash
+chmod +x install_n1.sh
+sudo N1_LAN_IP=192.168.1.100 ./install_n1.sh
+```
+
+Replace `192.168.1.100` with the LAN IP of your Raspberry Pi, TV box, mini PC, home server, VPS private interface, or other Linux relay host.
+
+For a public server or reverse-proxy deployment, run something like:
+
+```bash
+sudo N1_LAN_IP=192.168.1.100 \
+  PUBLIC_ACCESS_HOST=203.0.113.10 \
+  PRIMARY_ACCESS_HOST=203.0.113.10 \
+  CONTROL_UI_EXTRA_ORIGINS=https://openclaw.example.com \
+  ./install_n1.sh
+```
+
+The variable name `N1_LAN_IP` is kept for script compatibility. It can be used for any LAN or primary private IP, not only N1 hardware.
+
+### What the installer does
+
+The installer currently expects a real root/systemd host, not a minimal container shell. It checks for `apt-get`, `systemctl`, and a working systemd environment before installing.
+
+During installation it will:
+
+- install base packages such as `curl`, `jq`, `haproxy`, `xvfb`, `x11vnc`, `websockify`, `novnc`, build tools, Python, and related utilities;
+- detect or install Chrome/Chromium for browser-assisted login and attach-only web model workflows;
+- install Node.js 22 when needed;
+- enable `pnpm` through Corepack;
+- copy `CLIProxyAPI` into `/opt/cli-proxy-api`;
+- copy `openclaw-zero-token` into `/opt/openclaw-zero-token`;
+- install or build the `cli-proxy-api` binary depending on the host architecture;
+- install OpenClaw runtime dependencies;
+- install systemd service files;
+- install HAProxy queue config;
+- generate local API keys and gateway tokens if they are not provided;
+- write local access information files;
+- open UFW ports if UFW is active;
+- start and health-check the services.
+
+### Useful install variables
+
+| Variable | Purpose |
+| --- | --- |
+| `N1_LAN_IP` | LAN/private IP of the Linux relay host. Kept for compatibility with the original script name. |
+| `PUBLIC_ACCESS_HOST` | Public IP or domain when the host is reachable from outside the LAN. |
+| `PRIMARY_ACCESS_HOST` | Main address written into access URLs. Defaults to public host or LAN IP. |
+| `ACCESS_HOSTS_EXTRA` | Extra comma-separated hosts that should be treated as valid access hosts. |
+| `CONTROL_UI_EXTRA_ORIGINS` | Extra allowed origins for the OpenClaw control UI. |
+| `CLIPROXY_API_KEY` | Optional pre-supplied CLIProxyAPI API key. Generated automatically if omitted. |
+| `CLIPROXY_MGMT_SECRET_RAW` | Optional pre-supplied CLIProxyAPI management secret. Generated automatically if omitted. |
+| `OPENCLAW_GATEWAY_TOKEN` | Optional pre-supplied OpenClaw gateway token. Generated automatically if omitted. |
+| `OPENCLAW_MAIN_MAX_CONCURRENT` | Main OpenClaw concurrency. Defaults to `1` for small hosts. |
+| `OPENCLAW_SUBAGENT_MAX_CONCURRENT` | Subagent concurrency. Defaults to `1` for small hosts. |
+| `EXPOSE_NOVNC_PUBLIC` | Set to `1` only if you intentionally want UFW to allow noVNC port `6080`. |
+
+## Use after deployment
+
+After the installer finishes, it prints the main access URLs and writes them to local files on the target host.
+
+Access files:
+
+```text
+/opt/cli-proxy-api/ACCESS.txt
+/opt/openclaw-zero-token/ACCESS.txt
+```
+
+Read them with:
+
+```bash
+sudo cat /opt/cli-proxy-api/ACCESS.txt
+sudo cat /opt/openclaw-zero-token/ACCESS.txt
+```
+
+Typical URLs and ports:
+
+| Service | Default URL pattern |
+| --- | --- |
+| CLIProxyAPI management | `http://<host>:8317/management.html` |
+| CLIProxyAPI API base | `http://<host>:8317` |
+| OpenClaw control UI | `http://<host>:3001/#token=<OPENCLAW_GATEWAY_TOKEN>` |
+| OpenClaw OpenAI-compatible API base | `http://<host>:3002/v1` |
+| Chrome debug endpoint | `http://127.0.0.1:9222/json/version` |
+| noVNC browser login page | `http://<host>:6080/vnc.html` |
+
+For OpenClaw API clients, use:
+
+```text
+Base URL: http://<host>:3002/v1
+API Key:  value from /opt/openclaw-zero-token/ACCESS.txt
+```
+
+For CLIProxyAPI clients, use:
+
+```text
+Base URL: http://<host>:8317
+API Key:  value from /opt/cli-proxy-api/ACCESS.txt
+```
+
+When a web login is needed, start the browser login service manually:
+
+```bash
+sudo systemctl start openclaw-auth-browser.service
+```
+
+Then open the noVNC URL shown in `/opt/openclaw-zero-token/ACCESS.txt`.
+
+### Service commands
+
+Check service status:
+
+```bash
+sudo systemctl status cliproxyapi.service
+sudo systemctl status openclaw-chrome-debug.service
+sudo systemctl status openclaw-zero-token.service
+sudo systemctl status openclaw-api-queue.service
+```
+
+View logs:
+
+```bash
+sudo journalctl -u cliproxyapi.service -n 100 --no-pager
+sudo journalctl -u openclaw-zero-token.service -n 100 --no-pager
+sudo journalctl -u openclaw-api-queue.service -n 100 --no-pager
+sudo journalctl -u openclaw-chrome-debug.service -n 100 --no-pager
+```
+
+Restart services:
+
+```bash
+sudo systemctl restart cliproxyapi.service
+sudo systemctl restart openclaw-zero-token.service
+sudo systemctl restart openclaw-api-queue.service
+sudo systemctl restart openclaw-chrome-debug.service
+```
+
 ## Target behavior
 
 The intended deployed system looks like this:
@@ -144,16 +306,6 @@ For a home or lab network, the host can be reached through a LAN address such as
 
 The same layout can be adapted to a public Linux server. For public access, a reverse proxy and HTTPS should be used for the UI side. The noVNC/browser login service should not be exposed directly to the public internet unless the operator understands the risk.
 
-Example install variables:
-
-```bash
-sudo N1_LAN_IP=192.168.1.100 \
-  PUBLIC_ACCESS_HOST=203.0.113.10 \
-  PRIMARY_ACCESS_HOST=203.0.113.10 \
-  CONTROL_UI_EXTRA_ORIGINS=https://openclaw.example.com \
-  ./install_n1.sh
-```
-
 The variable name `N1_LAN_IP` is kept for compatibility with the original script, but it can represent any LAN IP for a Raspberry Pi, TV box, mini PC, home server, or other Linux relay host.
 
 ## Source-first public release
@@ -169,35 +321,6 @@ For a completely offline one-shot install, generated artifacts such as prebuilt 
 - keep a private machine-specific deployment bundle outside the public source repository.
 
 The current public branch is the integration source and documentation base. The next step is to make the build/release artifact path cleaner so a fresh clone can be turned into a ready-to-run bundle with fewer manual steps.
-
-## What the installer is meant to handle
-
-The installer is designed around the deployment shape, not around a single binary:
-
-- verify the expected layout before changing the target machine;
-- install runtime packages;
-- detect or install a usable Chrome/Chromium package;
-- install Node.js 22 and pnpm when needed;
-- copy project files into `/opt`;
-- install OpenClaw runtime dependencies;
-- install service files;
-- install HAProxy queue config;
-- generate local API keys and access information when not provided;
-- enable services at boot;
-- start services and stop early with logs if a health check fails.
-
-Typical local output files after install:
-
-- `/opt/cli-proxy-api/ACCESS.txt`
-- `/opt/openclaw-zero-token/ACCESS.txt`
-
-Typical ports:
-
-- `8317` -> CLIProxyAPI
-- `3001` -> OpenClaw control UI
-- `3002` -> serialized OpenClaw API
-- `9222` -> local Chrome CDP for attach-only web models
-- `6080` -> noVNC auth browser
 
 ## Security boundary
 
