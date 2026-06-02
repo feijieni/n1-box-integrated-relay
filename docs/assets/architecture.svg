@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1180" height="640" viewBox="0 0 1180 640" role="img" aria-labelledby="title desc">
-  <title id="title">N1 Box Integrated Relay architecture</title>
-  <desc id="desc">A diagram showing client devices, LAN or public access, HAProxy queueing, CLIProxyAPI, OpenClaw Zero Token, Chrome browser service, systemd supervision, and local runtime state.</desc>
+  <title id="title">Linux Device AI Relay architecture</title>
+  <desc id="desc">A diagram showing client devices, LAN or public access, HAProxy queueing, CLIProxyAPI, OpenClaw Zero Token, Chrome browser service, systemd supervision, and local runtime state on a small Linux device or server.</desc>
   <defs>
     <style>
       .bg { fill: #f7f8fa; }
@@ -24,8 +24,8 @@
     </marker>
   </defs>
   <rect class="bg" width="1180" height="640"/>
-  <text x="40" y="54" class="title">N1 Box Integrated Relay</text>
-  <text x="40" y="82" class="t">A small Linux box becomes a managed AI relay node instead of a loose set of manual scripts.</text>
+  <text x="40" y="54" class="title">Linux Device AI Relay</text>
+  <text x="40" y="82" class="t">Raspberry Pi, TV box, mini PC, home server, or VPS becomes a managed AI relay host.</text>
 
   <rect x="40" y="120" width="210" height="360" class="panel"/>
   <text x="68" y="155" class="h">Clients</text>
@@ -40,27 +40,28 @@
   <text x="90" y="415" class="s">OpenClaw-style calls</text>
 
   <rect x="315" y="120" width="565" height="420" class="panel"/>
-  <text x="344" y="155" class="h">N1 / Linux relay node</text>
+  <text x="344" y="155" class="h">Linux relay host</text>
+  <text x="344" y="177" class="s">Ubuntu / Debian / Armbian / similar systemd-based Linux</text>
 
-  <rect x="350" y="190" width="210" height="80" class="box2"/>
-  <text x="380" y="220" class="h">CLIProxyAPI</text>
-  <text x="377" y="244" class="s">API proxy and provider compatibility</text>
+  <rect x="350" y="205" width="210" height="80" class="box2"/>
+  <text x="380" y="235" class="h">CLIProxyAPI</text>
+  <text x="377" y="259" class="s">API proxy and provider compatibility</text>
 
-  <rect x="625" y="190" width="210" height="80" class="box2"/>
-  <text x="653" y="220" class="h">OpenClaw service</text>
-  <text x="650" y="244" class="s">runtime, tools, channels, control UI</text>
+  <rect x="625" y="205" width="210" height="80" class="box2"/>
+  <text x="653" y="235" class="h">OpenClaw service</text>
+  <text x="650" y="259" class="s">runtime, tools, channels, control UI</text>
 
-  <rect x="625" y="315" width="210" height="80" class="box3"/>
-  <text x="653" y="345" class="h">HAProxy queue</text>
-  <text x="652" y="369" class="s">serialized API path for small boxes</text>
+  <rect x="625" y="325" width="210" height="80" class="box3"/>
+  <text x="653" y="355" class="h">HAProxy queue</text>
+  <text x="650" y="379" class="s">serialized API path for smaller hosts</text>
 
-  <rect x="350" y="315" width="210" height="80" class="box3"/>
-  <text x="379" y="345" class="h">Chrome service</text>
-  <text x="377" y="369" class="s">browser login and attach-only models</text>
+  <rect x="350" y="325" width="210" height="80" class="box3"/>
+  <text x="379" y="355" class="h">Chrome service</text>
+  <text x="377" y="379" class="s">browser login and attach-only models</text>
 
-  <rect x="486" y="440" width="210" height="60" class="warn"/>
-  <text x="518" y="465" class="h">systemd supervision</text>
-  <text x="516" y="486" class="s">boot start, restart, health checks</text>
+  <rect x="486" y="450" width="210" height="60" class="warn"/>
+  <text x="518" y="475" class="h">systemd supervision</text>
+  <text x="516" y="496" class="s">boot start, restart, health checks</text>
 
   <rect x="935" y="120" width="205" height="360" class="panel"/>
   <text x="964" y="155" class="h">Local runtime state</text>
@@ -74,15 +75,15 @@
   <text x="992" y="391" class="t">config.yaml</text>
   <text x="986" y="412" class="s">machine-specific</text>
 
-  <path d="M250 216 C285 216 305 216 345 216" class="line"/>
-  <path d="M250 307 C310 307 345 245 350 240" class="line"/>
-  <path d="M250 398 C330 398 570 370 625 360" class="line"/>
-  <path d="M560 230 C590 230 600 230 625 230" class="line"/>
-  <path d="M730 270 L730 315" class="line"/>
-  <path d="M625 355 C600 355 585 355 560 355" class="line2"/>
-  <path d="M835 230 C880 230 920 216 965 216" class="line"/>
-  <path d="M835 355 C900 355 925 307 965 307" class="line"/>
-  <path d="M560 355 C790 425 840 398 965 398" class="line"/>
+  <path d="M250 216 C285 216 305 216 345 231" class="line"/>
+  <path d="M250 307 C310 307 345 260 350 255" class="line"/>
+  <path d="M250 398 C330 398 570 380 625 370" class="line"/>
+  <path d="M560 245 C590 245 600 245 625 245" class="line"/>
+  <path d="M730 285 L730 325" class="line"/>
+  <path d="M625 365 C600 365 585 365 560 365" class="line2"/>
+  <path d="M835 245 C880 245 920 216 965 216" class="line"/>
+  <path d="M835 365 C900 365 925 307 965 307" class="line"/>
+  <path d="M560 365 C790 425 840 398 965 398" class="line"/>
 
-  <text x="356" y="590" class="s">Public repository contains source, templates, docs, and deployment logic. Target machine contains generated secrets and runtime state.</text>
+  <text x="318" y="590" class="s">Public repository contains source, templates, docs, checks, and deployment logic. Target host contains generated secrets and runtime state.</text>
 </svg>
