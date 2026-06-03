@@ -37,23 +37,41 @@ check_markdown_links_basic() {
   printf 'Checking basic local markdown links...\n'
 
   local found=0
-  while IFS= read -r link; do
-    [ -n "$link" ] || continue
-    case "$link" in
-      http://*|https://*|mailto:*|#*)
-        continue
-        ;;
-    esac
+  local md_file
+  local link
+  local clean
+  local base_dir
+  local target
 
-    local clean="$link"
-    clean="${clean%%#*}"
-    clean="${clean#./}"
+  while IFS= read -r md_file; do
+    base_dir="$(dirname "$md_file")"
 
-    if [ -n "$clean" ] && [ ! -e "$clean" ]; then
-      found=1
-      printf 'Broken local link: %s\n' "$link" >&2
-    fi
-  done < <(grep -RhoE '\[[^]]+\]\(([^)]+)\)' README.md docs/*.md 2>/dev/null | sed -E 's/^.*\]\(([^)]+)\).*$/\1/')
+    while IFS= read -r link; do
+      [ -n "$link" ] || continue
+
+      case "$link" in
+        http://*|https://*|mailto:*|\#*)
+          continue
+          ;;
+      esac
+
+      clean="$link"
+      clean="${clean%%#*}"
+      clean="${clean#./}"
+      [ -n "$clean" ] || continue
+
+      if [ "$base_dir" = "." ]; then
+        target="$clean"
+      else
+        target="$base_dir/$clean"
+      fi
+
+      if [ ! -e "$target" ]; then
+        found=1
+        printf 'Broken local link in %s: %s -> %s\n' "$md_file" "$link" "$target" >&2
+      fi
+    done < <(grep -hoE '\[[^]]+\]\(([^)]+)\)' "$md_file" 2>/dev/null | sed -E 's/^.*\]\(([^)]+)\).*$/\1/')
+  done < <(find README.md docs -name '*.md' -type f -print)
 
   if [ "$found" -eq 1 ]; then
     fail "one or more local markdown links are broken"
@@ -88,9 +106,14 @@ main() {
   check_file install_n1.sh
   check_file scripts/check-publish-safety.sh
   check_file scripts/doctor.sh
+  check_file scripts/check-repo-health.sh
   check_file docs/design-decisions.md
   check_file docs/why-this-project.md
   check_file docs/release-v0.1.0.md
+  check_file docs/support-matrix.md
+  check_file docs/maintenance-log.md
+  check_file docs/zh-CN/README.md
+  check_file docs/ja/README.md
   check_file docs/assets/architecture.svg
   check_file docs/assets/request-flow.svg
 
