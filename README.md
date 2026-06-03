@@ -17,6 +17,13 @@ The important part of this repository is not just that those upstream trees are 
 
 In short, this is an attempt to turn a one-off Linux relay setup into something other people can inspect, adapt, and reproduce on their own device or server.
 
+## Localized documentation
+
+- [中文专区](./docs/zh-CN/README.md)
+- [日本語セクション](./docs/ja/README.md)
+
+These localized pages cover the project purpose, supported devices, deployment commands, post-install usage, maintenance commands, and safety notes.
+
 ## What problem it solves
 
 Running AI relay tooling on a normal desktop is one thing. Running it on a small always-on host is different.
@@ -348,15 +355,15 @@ The current public branch is the integration source and documentation base. The 
 
 These should not be committed:
 
-- `.openclaw-upstream-state/`
-- `auth-profiles.json`
-- real `ACCESS.txt`
-- real `config.yaml`
-- cookies
-- bearer tokens
-- account logs
-- local browser profiles
-- machine-specific runtime directories
+- `.openclaw-upstream-state/`;
+- `auth-profiles.json`;
+- real `ACCESS.txt`;
+- real `config.yaml`;
+- cookies;
+- bearer tokens;
+- account logs;
+- local browser profiles;
+- machine-specific runtime directories.
 
 The repository should contain source, examples, templates, and deployment logic. Real secrets and runtime state should be generated or stored on the target machine.
 
@@ -391,6 +398,8 @@ That is the part I want to keep improving.
 
 ## Docs
 
+- [中文专区](./docs/zh-CN/README.md)
+- [日本語セクション](./docs/ja/README.md)
 - [Why this project matters](./docs/why-this-project.md)
 - [Design decisions](./docs/design-decisions.md)
 - [Support matrix](./docs/support-matrix.md)
