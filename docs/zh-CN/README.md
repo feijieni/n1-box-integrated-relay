@@ -1,4 +1,4 @@
-# 中文专区：Linux Device AI Relay Package
+# 中文：Linux Device AI Relay Package
 
 这个项目最初来自一个很实际的需求：把一台小型 Linux 设备或服务器，变成一个长期在线的 AI relay 节点，而不是只在某一台机器上能跑的一堆临时脚本。
 
