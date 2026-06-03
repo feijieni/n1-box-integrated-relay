@@ -57,6 +57,8 @@ Typical operating systems include:
 
 The project is most useful when the machine is meant to stay online and provide relay services for other devices, tools, or agent workflows.
 
+See [Support matrix](./docs/support-matrix.md) for the current target classes, operating systems, CPU architecture notes, and default runtime expectations.
+
 ## What is inside
 
 ```text
@@ -369,6 +371,8 @@ This is an early public release, but the direction is clear:
 - document failure cases such as browser login problems, queue behavior, proxy access, and service startup failures;
 - keep upstream synchronization understandable instead of hiding changes in a private bundle.
 
+See [Maintenance log](./docs/maintenance-log.md) for the current maintenance notes and next tasks.
+
 ## Why it is not just an integration dump
 
 A simple integration dump would only place two upstream projects in one folder.
@@ -389,6 +393,8 @@ That is the part I want to keep improving.
 
 - [Why this project matters](./docs/why-this-project.md)
 - [Design decisions](./docs/design-decisions.md)
+- [Support matrix](./docs/support-matrix.md)
+- [Maintenance log](./docs/maintenance-log.md)
 - [Install on Linux or N1](./docs/install-n1.md)
 - [Quick start](./docs/quick-start.md)
 - [Public server deployment](./docs/public-server.md)
