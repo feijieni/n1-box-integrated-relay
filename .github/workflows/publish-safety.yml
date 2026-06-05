@@ -14,6 +14,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Run project rules checks
+        run: bash scripts/check-project-rules.sh
+
       - name: Run publish safety checks
         run: bash scripts/check-publish-safety.sh
 
