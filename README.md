@@ -13,7 +13,7 @@ The important part of this repository is not just that those upstream trees are 
 - Chrome/Chromium service management for browser-based model login and attach-only web workflows;
 - install-time configuration for LAN and public access;
 - a safer publish layout that keeps real cookies, access files, browser state, and local runtime data out of Git;
-- notes and scripts that document how this setup is expected to run after reboot.
+- executable project rules and repository checks that protect the public deployment layout.
 
 In short, this is an attempt to turn a one-off Linux relay setup into something other people can inspect, adapt, and reproduce on their own device or server.
 
@@ -72,12 +72,13 @@ See [Support matrix](./docs/support-matrix.md) for the current target classes, o
 linux-ai-relay/
 ├── CLIProxyAPI/              # API proxy/provider compatibility source tree
 ├── openclaw-zero-token/      # OpenClaw runtime, tools, channels, and browser-related source tree
-├── config/                   # publishable example configs
+├── config/                   # publishable example configs and project rules
 ├── haproxy/                  # serialized API queue config
 ├── systemd/                  # service definitions
-├── scripts/                  # non-destructive checks and maintainer helpers
+├── scripts/                  # checks and maintainer helpers
 ├── docs/                     # install, security, design, and deployment notes
-├── install_n1.sh             # Linux install entry point, kept for compatibility with the original name
+├── install_linux_relay.sh    # preferred generic Linux installer entrypoint
+├── install_n1.sh             # compatibility installer entrypoint
 ├── .gitignore
 ├── LICENSE
 └── README.md
@@ -91,22 +92,39 @@ upstream source trees + Linux device/server deployment layer + service orchestra
 
 That last part matters. Without the deployment layer, this would mostly be a source mirror. Without the upstream projects, the deployment layer would not do anything useful. The value is in making the combined system understandable and repeatable across small Linux devices and servers.
 
+## Project rules
+
+This repository includes a small rules feature that protects the public deployment layout.
+
+```text
+config/project-rules.json
+scripts/check-project-rules.sh
+```
+
+`config/project-rules.json` defines required files, required directories, README positioning phrases, forbidden tracked runtime paths, installer expectations, and localized documentation expectations.
+
+Run it with:
+
+```bash
+bash scripts/check-project-rules.sh
+```
+
+The GitHub Actions workflow runs the project rules before the broader repository health, publish safety, and doctor checks. See [Project rules](./docs/project-rules.md) for the full description.
+
 ## Quick checks before installing
 
 The repository includes non-destructive checks that are safe to run before installing anything.
 
 ```bash
 bash scripts/doctor.sh
-```
-
-`doctor.sh` checks the local machine and repository layout. It looks for required project files, optional build artifacts, useful host commands, common relay ports, and existing systemd service names. It does not install packages, start services, or write system files.
-
-```bash
+bash scripts/check-project-rules.sh
 bash scripts/check-repo-health.sh
 bash scripts/check-publish-safety.sh
 ```
 
-These checks are also wired into GitHub Actions. They help keep the public repository useful and safe by checking shell syntax, local docs links, expected files, large tracked files, private machine identifiers, and obvious secret-shaped mistakes.
+`doctor.sh` checks the local machine and repository layout. It looks for required project files, optional build artifacts, useful host commands, common relay ports, and existing systemd service names. It does not install packages, start services, or write system files.
+
+The other checks are also wired into GitHub Actions. They help keep the public repository useful and safe by checking shell syntax, local docs links, expected files, large tracked files, private machine identifiers, forbidden runtime paths, and obvious secret-shaped mistakes.
 
 ## Deployment requirements
 
@@ -120,17 +138,23 @@ The current installer is meant for a real Linux host with:
 
 The installer is not designed for a minimal container shell because it needs systemd services, service health checks, local ports, and persistent runtime directories.
 
-The public repository is source-first. Some generated outputs or prebuilt artifacts may be absent from a fresh clone. The installer already has source-build behavior for `CLIProxyAPI` when a bundled binary for the host architecture is missing, but release-bundle handling is still one of the next areas to improve.
+The public repository is source-first. Generated outputs or prebuilt artifacts may be absent from a fresh clone. The installer supports source-build behavior for `CLIProxyAPI` when a bundled binary for the host architecture is missing, and it can attempt an OpenClaw source build when `openclaw-zero-token/dist` is missing.
 
 ## Deploy
 
-The main installer is:
+The preferred generic installer is:
+
+```bash
+install_linux_relay.sh
+```
+
+The compatibility installer is:
 
 ```bash
 install_n1.sh
 ```
 
-The file name is kept for compatibility with the original deployment, but the script is meant for Debian/Ubuntu/Armbian-style Linux hosts with `apt-get` and systemd.
+The `install_n1.sh` name is kept for compatibility with the original deployment target. New users should normally run `install_linux_relay.sh`.
 
 ### 1. Clone on the target host
 
@@ -145,17 +169,18 @@ cd n1-box-integrated-relay
 
 ```bash
 bash scripts/doctor.sh
+bash scripts/check-project-rules.sh
 bash scripts/check-repo-health.sh
 bash scripts/check-publish-safety.sh
 ```
 
-If `doctor.sh` warns that optional build artifacts such as `CLIProxyAPI/bin` or `openclaw-zero-token/dist` are missing, that means the checkout is source-first. Review the warning before installing. Required repository files must be present before the installer can run.
+If `doctor.sh` warns that optional build artifacts such as `CLIProxyAPI/bin` or `openclaw-zero-token/dist` are missing, that means the checkout is source-first. The installer can build some missing artifacts from source, but small devices may need more time and disk space.
 
 ### 3. Install for a LAN device or home server
 
 ```bash
-chmod +x install_n1.sh
-sudo N1_LAN_IP=192.168.1.100 ./install_n1.sh
+chmod +x install_linux_relay.sh install_n1.sh
+sudo N1_LAN_IP=192.168.1.100 ./install_linux_relay.sh
 ```
 
 Replace `192.168.1.100` with the LAN IP of your Raspberry Pi, TV box, mini PC, home server, VPS private interface, or other Linux relay host.
@@ -167,7 +192,7 @@ sudo N1_LAN_IP=192.168.1.100 \
   PUBLIC_ACCESS_HOST=203.0.113.10 \
   PRIMARY_ACCESS_HOST=203.0.113.10 \
   CONTROL_UI_EXTRA_ORIGINS=https://openclaw.example.com \
-  ./install_n1.sh
+  ./install_linux_relay.sh
 ```
 
 The variable name `N1_LAN_IP` is kept for script compatibility. It can be used for any LAN or primary private IP, not only N1 hardware.
@@ -186,7 +211,7 @@ During installation it will:
 - copy `CLIProxyAPI` into `/opt/cli-proxy-api`;
 - copy `openclaw-zero-token` into `/opt/openclaw-zero-token`;
 - install or build the `cli-proxy-api` binary depending on the host architecture;
-- install OpenClaw runtime dependencies;
+- install or build OpenClaw runtime dependencies and `dist` when needed;
 - install systemd service files;
 - install HAProxy queue config;
 - generate local API keys and gateway tokens if they are not provided;
@@ -212,7 +237,7 @@ During installation it will:
 
 ## Use after deployment
 
-After the installer finishes, it prints the main access URLs and writes them to local files on the target host.
+After the installer finishes, it prints the main host summary and writes the actual access details to local files on the target host.
 
 Access files:
 
@@ -402,6 +427,7 @@ That is the part I want to keep improving.
 - [日本語セクション](./docs/ja/README.md)
 - [Why this project matters](./docs/why-this-project.md)
 - [Design decisions](./docs/design-decisions.md)
+- [Project rules](./docs/project-rules.md)
 - [Support matrix](./docs/support-matrix.md)
 - [Maintenance log](./docs/maintenance-log.md)
 - [Install on Linux or N1](./docs/install-n1.md)
@@ -413,4 +439,4 @@ That is the part I want to keep improving.
 
 ## Short description
 
-A Linux deployment project for running self-hosted AI relay nodes on Raspberry Pi boards, TV boxes, mini PCs, home servers, and small VPS hosts. It combines CLIProxyAPI, OpenClaw Zero Token, systemd services, HAProxy queueing, browser-based model login, safety checks, and safe publish rules into one reproducible layout.
+A Linux deployment project for running self-hosted AI relay nodes on Raspberry Pi boards, TV boxes, mini PCs, home servers, and small VPS hosts. It combines CLIProxyAPI, OpenClaw Zero Token, systemd services, HAProxy queueing, browser-based model login, safety checks, project rules, and safe publish rules into one reproducible layout.
