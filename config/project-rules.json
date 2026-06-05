@@ -1,0 +1,88 @@
+{
+  "version": 1,
+  "projectName": "Linux Device AI Relay Package",
+  "preferredInstaller": "install_linux_relay.sh",
+  "compatibilityInstaller": "install_n1.sh",
+  "requiredFiles": [
+    "README.md",
+    "CHANGELOG.md",
+    "MAINTAINING.md",
+    "install_linux_relay.sh",
+    "install_n1.sh",
+    "scripts/doctor.sh",
+    "scripts/check-repo-health.sh",
+    "scripts/check-publish-safety.sh",
+    "scripts/check-project-rules.sh",
+    "docs/why-this-project.md",
+    "docs/design-decisions.md",
+    "docs/support-matrix.md",
+    "docs/maintenance-log.md",
+    "docs/zh-CN/README.md",
+    "docs/ja/README.md",
+    "docs/assets/architecture.svg",
+    "docs/assets/request-flow.svg",
+    "config/cliproxyapi.config.yaml.example",
+    "config/openclaw.json.example",
+    "haproxy/openclaw-api-queue.cfg",
+    "systemd/cliproxyapi.service",
+    "systemd/openclaw-chrome-debug.service",
+    "systemd/openclaw-zero-token.service",
+    "systemd/openclaw-api-queue.service",
+    "systemd/openclaw-auth-browser.service"
+  ],
+  "requiredDirectories": [
+    "CLIProxyAPI",
+    "openclaw-zero-token",
+    "config",
+    "haproxy",
+    "systemd",
+    "scripts",
+    "docs",
+    "docs/zh-CN",
+    "docs/ja",
+    "docs/assets"
+  ],
+  "requiredReadmePhrases": [
+    "Linux Device AI Relay Package",
+    "Raspberry Pi",
+    "TV box",
+    "mini PC",
+    "small VPS",
+    "install_linux_relay.sh",
+    "install_n1.sh",
+    "ACCESS.txt",
+    "OpenClaw OpenAI-compatible API base",
+    "Security boundary"
+  ],
+  "forbiddenTrackedPathPatterns": [
+    "(^|/)ACCESS\\.txt$",
+    "(^|/)config\\.yaml$",
+    "(^|/)auth-profiles\\.json$",
+    "(^|/)\\.env(\\..*)?$",
+    "(^|/)cookies?([^/]*)$",
+    "(^|/)\\.openclaw-upstream-state(/|$)",
+    "(^|/)chrome-profile(/|$)",
+    "(^|/)user-data(/|$)",
+    "(^|/)User Data(/|$)",
+    "(^|/)Default/Cookies$"
+  ],
+  "requiredPorts": [
+    8317,
+    3001,
+    3002,
+    9222,
+    6080
+  ],
+  "secretShapeAllowlist": [
+    "CHANGE_ME_API_KEY",
+    "CHANGE_ME_BCRYPT_HASH",
+    "OPENCLAW_GATEWAY_TOKEN",
+    "CLIPROXY_API_KEY",
+    "CLIPROXY_MGMT_SECRET_RAW"
+  ],
+  "notes": [
+    "Public repository should contain source, examples, templates, docs, and checks.",
+    "Runtime state and real secrets must be generated or stored on the target host.",
+    "The generic installer is install_linux_relay.sh; install_n1.sh remains for backward compatibility."
+  ]
+}
