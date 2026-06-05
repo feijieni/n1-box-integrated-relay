@@ -104,6 +104,7 @@ main() {
   check_file CHANGELOG.md
   check_file MAINTAINING.md
   check_file install_n1.sh
+  check_file install_linux_relay.sh
   check_file scripts/check-publish-safety.sh
   check_file scripts/doctor.sh
   check_file scripts/check-repo-health.sh
