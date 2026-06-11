@@ -104,6 +104,19 @@ check_installer_entrypoints() {
   fi
 }
 
+check_doctor_fix_mode() {
+  printf 'Checking doctor safe fix mode...\n'
+
+  if grep -Fq -- '--fix applies safe repairs only' "$ROOT_DIR/scripts/doctor.sh" \
+    && grep -Fq 'FIX_MODE=0' "$ROOT_DIR/scripts/doctor.sh" \
+    && grep -Fq 'check_repository_safety_rules' "$ROOT_DIR/scripts/doctor.sh" \
+    && grep -Fq 'check_local_runtime_permissions' "$ROOT_DIR/scripts/doctor.sh"; then
+    pass "doctor exposes safe --fix mode"
+  else
+    fail "doctor.sh should keep the documented safe --fix mode"
+  fi
+}
+
 check_localized_docs() {
   printf 'Checking localized documentation sections...\n'
 
@@ -144,6 +157,7 @@ main() {
     check_readme_phrases
     check_forbidden_tracked_paths
     check_installer_entrypoints
+    check_doctor_fix_mode
     check_localized_docs
   fi
 
