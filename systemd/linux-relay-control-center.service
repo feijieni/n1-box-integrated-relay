@@ -1,0 +1,21 @@
+[Unit]
+Description=Linux Device AI Relay Control Center
+After=network-online.target cliproxyapi.service openclaw-zero-token.service openclaw-api-queue.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/linux-relay-control-center
+Environment=CONTROL_CENTER_HOST=127.0.0.1
+Environment=CONTROL_CENTER_PORT=3099
+Environment=CONTROL_CENTER_TOKEN_FILE=/opt/linux-relay-control-center/control-token
+ExecStart=/usr/bin/python3 /opt/linux-relay-control-center/control_center.py
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target
