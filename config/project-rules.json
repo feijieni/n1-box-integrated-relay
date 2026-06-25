@@ -6,7 +6,10 @@
   "requiredFiles": [
     "README.md",
     "CHANGELOG.md",
+    "CONTRIBUTING.md",
+    "SECURITY.md",
     "MAINTAINING.md",
+    ".github/pull_request_template.md",
     "install_linux_relay.sh",
     "install_n1.sh",
     "control-center/control_center.py",
@@ -19,6 +22,10 @@
     "docs/design-decisions.md",
     "docs/project-rules.md",
     "docs/control-center.md",
+    "docs/troubleshooting.md",
+    "docs/roadmap.md",
+    "docs/release-v0.1.0.md",
+    "docs/release-v0.1.1.md",
     "docs/support-matrix.md",
     "docs/maintenance-log.md",
     "docs/zh-CN/README.md",
@@ -47,7 +54,8 @@
     "docs",
     "docs/zh-CN",
     "docs/ja",
-    "docs/assets"
+    "docs/assets",
+    ".github"
   ],
   "requiredReadmePhrases": [
     "Linux Device AI Relay Package",
@@ -94,6 +102,7 @@
     "Public repository should contain source, examples, templates, docs, checks, and read-only control center code.",
     "Runtime state and real secrets must be generated or stored on the target host.",
     "The generic installer is install_linux_relay.sh; install_n1.sh remains for backward compatibility.",
-    "The control center is read-only by default and must not expose secrets."
+    "The control center is read-only by default and must not expose secrets.",
+    "Contributing, security, troubleshooting, roadmap, and release notes are part of the maintained public surface."
   ]
 }
